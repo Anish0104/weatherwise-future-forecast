@@ -1,20 +1,32 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { SensorCard } from "@/components/sensor-card";
 import { ForecastChart } from "@/components/forecast-chart";
-import { mockSensorData, mockPredictionData, indiaRegions } from "@/lib/mock-data";
+import { mockSensorData, mockPredictionData } from "@/lib/mock-data";
 import { motion } from "framer-motion";
+import { IndiaMap } from "@/components/india-map";
+
+// Mumbai region data for map demo
+const mumbaiRegion = [
+  {
+    name: "Mumbai",
+    position: [19.076, 72.8777] as [number, number],
+    current: "Scattered Clouds",
+    rainfall: 12.2,
+    humidity: 81,
+    moisture: 39,
+    pressure: 1012,
+  }
+];
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedParameter, setSelectedParameter] = useState<"rainfall" | "moisture" | "humidity" | "pressure">("rainfall");
-  
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  // Map of parameters to their respective units
   const parameterUnits = {
     rainfall: "mm",
     moisture: "%",
@@ -24,14 +36,12 @@ const Index = () => {
 
   return (
     <ThemeProvider>
-      <div className="flex min-h-screen bg-gradient-to-br from-background to-secondary/10">
+      <div className="flex min-h-screen bg-gradient-to-br from-background to-primary/10">
         <Sidebar isOpen={sidebarOpen} />
-        
         <div 
           className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'md:ml-[240px]' : 'ml-0'}`}
         >
           <Header isSidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-          
           <main className="container mx-auto px-4 py-6">
             <div className="grid gap-6">
               {/* Sensor Cards Section */}
@@ -72,13 +82,11 @@ const Index = () => {
                   />
                 </div>
               </section>
-              
+
               {/* Forecast Chart Section */}
               <section style={{ "--delay": 3 } as React.CSSProperties} className="dashboard-section">
                 <div className="bg-card p-6 rounded-xl shadow-md">
                   <h2 className="text-2xl font-bold mb-4">Hourly Forecast</h2>
-                  
-                  {/* Parameter selector */}
                   <div className="flex flex-wrap gap-2 mb-6">
                     {(["rainfall", "moisture", "humidity", "pressure"] as const).map((param) => (
                       <button
@@ -94,8 +102,6 @@ const Index = () => {
                       </button>
                     ))}
                   </div>
-                  
-                  {/* Chart */}
                   <ForecastChart 
                     data={mockPredictionData[selectedParameter]}
                     parameter={selectedParameter}
@@ -103,26 +109,24 @@ const Index = () => {
                   />
                 </div>
               </section>
-              
-              {/* Map Section */}
+
+              {/* Map Section (Mumbai) */}
               <section style={{ "--delay": 5 } as React.CSSProperties} className="dashboard-section">
                 <div className="bg-card p-6 rounded-xl shadow-md">
-                  <h2 className="text-2xl font-bold mb-4">Regional Weather Map</h2>
+                  <h2 className="text-2xl font-bold mb-4">Mumbai Weather Map</h2>
                   <p className="mb-4 text-muted-foreground">
-                    Interactive map showing weather conditions across India. Click on markers to see details.
+                    Interactive map showing live sensor conditions in Mumbai.
                   </p>
-                  
                   <div className="h-[400px] w-full">
-                    {/* Map will be added in phase 2 */}
-                    <div className="flex items-center justify-center h-full border-2 border-dashed border-muted rounded-xl">
-                      <p className="text-muted-foreground">
-                        Map integration will be available in the next update
-                      </p>
-                    </div>
+                    <IndiaMap 
+                      regions={mumbaiRegion}
+                      center={[19.076, 72.8777]}
+                      zoom={11}
+                    />
                   </div>
                 </div>
               </section>
-              
+
               {/* Footer */}
               <footer className="mt-8 text-center text-sm text-muted-foreground">
                 <p>WeatherWise: Real-Time Forecasting System</p>
